@@ -155,27 +155,3 @@ class _TelaAdicionaEventoState extends State<TelaAdicionaEvento> {
     );
   }
 }
-
-/*
-TextField(
-keyboardType: TextInputType.datetime,
-decoration: InputDecoration(
-labelText: "Data evento",
-labelStyle: TextStyle(fontSize: 15, color: Colors.indigo)),
-style: TextStyle(fontSize: 23),
-controller: _controllerData,
-onChanged: (String valor){
-setState(() {
-_calculaHabilitaSalvar();
-});
-},
-)
-
- */
-
-//Text("${selectedDate.toLocal()}".split(' ')[0]),
-//SizedBox(height: 20.0,),
-//RaisedButton(
-//onPressed: () => _selectDate(context),
-//child: Text('Data'),
-//)
