@@ -51,24 +51,35 @@ class AnotacaoHelper {
   }
 
   Future<int> atualizarAnotacao(Anotacao anotacao) async{
-    Database dataBase = await database;
+    var dataBase = await database;
 
-    int id = await dataBase.update(nomeTabela, anotacao.toMap(),
-    where: "id = ?",
-      whereArgs: [anotacao.id]
+    return await dataBase.update(
+        nomeTabela,
+        anotacao.toMap(),
+        where: "id = ?",
+        whereArgs: [anotacao.id]
     );
-    return id;
+
   }
 
   listarAnotacao() async {
     var formatter = new DateFormat('yyyy-MM-dd');
 
     DateTime dataNow = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).toLocal();
-    dataNow = Jiffy(dataNow).add(days: 1);
-    String teste = formatter.format(dataNow);
+    dataNow = Jiffy(dataNow).add(days: 10);
+    String atual = formatter.format(dataNow);
     var dataBase = await database;
 
-    String sql = "SELECT * FROM $nomeTabela WHERE dataProximaRevisao BETWEEN '2000-01-01' AND '$teste'";
+    String sql = "SELECT * "
+        "FROM $nomeTabela inner join evento "
+        "on $nomeTabela.idEvento = evento.id "
+        "WHERE $nomeTabela.dataProximaRevisao BETWEEN '2000-01-01' AND '$atual' "
+        "OR julianday(evento.data) = julianday('now', '+7 days') "
+        "OR julianday(evento.data) = julianday('now', '+5 days') "
+        "OR julianday(evento.data) = julianday('now', '+3 days') "
+        "OR julianday(evento.data) = julianday('now', '+2 days') "
+        "OR julianday(evento.data) = julianday('now', '+1 days')";
+
     List listaAnotacao = await dataBase.rawQuery(sql);
     return listaAnotacao;
   }
@@ -82,26 +93,3 @@ class AnotacaoHelper {
     );
   }
 }
-/*
-class Singleton {
-  static final Singleton _singleton = Singleton._internal();
-  	factory Singleton(){
-      print("Singleton");
-      return _singleton;
-    }
-    Singleton._internal(){
-    	print("_internal");
-  	}
-}
-void main() {
-
-  var i1 = Singleton();
-  print("***");
-  var i2 = Singleton();
-
-  print( i1 == i2 );
-
-}
-
-
-* */

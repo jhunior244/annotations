@@ -84,7 +84,6 @@ class _TelaListaAnotacaoState extends State<TelaListaAnotacao> {
     anotacao.coeficienteProximaRevisao += auxCoefRevAnterior;
     _anotacaoHelper.atualizarAnotacao(anotacao);
     _listaAnotacoes();
-    print(anotacao.dataProximaRevisao);
   }
 
   @override

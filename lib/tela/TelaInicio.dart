@@ -1,5 +1,6 @@
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hellor_world/helper/AnotacaoHelper.dart';
 import 'package:hellor_world/helper/EventoHelper.dart';
 import 'package:hellor_world/model/Anotacao.dart';
@@ -12,6 +13,9 @@ class TelaInicio extends StatefulWidget {
 }
 
 class _TelaInicioState extends State<TelaInicio> {
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
   var _eventoHelper = EventoHelper();
   var _anotacaoHelper = AnotacaoHelper();
   var _habilitaBotaoSalvar = false;
@@ -23,6 +27,31 @@ class _TelaInicioState extends State<TelaInicio> {
   void initState() {
     _listaEventos();
     _habilitaBotaoSalvar = false;
+
+    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    // If you have skipped STEP 3 then change app_icon to @mipmap/ic_launcher
+    var initializationSettingsAndroid = new AndroidInitializationSettings('app_icon');
+
+    var initializationSettingsIOS = new IOSInitializationSettings();
+
+    var initializationSettings = new InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
+
+    flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+  }
+
+  Future onSelectNotification(String payload) async {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return new AlertDialog(
+          title: Text("PayLoad"),
+          content: Text("Payload : $payload"),
+        );
+      },
+    );
   }
 
   void _calculaHabilitaSalvar(){
