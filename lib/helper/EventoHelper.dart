@@ -1,6 +1,10 @@
+import 'package:hellor_world/helper/DataBaseHelper.dart';
+import 'package:hellor_world/model/Anotacao.dart';
 import 'package:hellor_world/model/Evento.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart' show getApplicationDocumentsDirectory;
+
 
 class EventoHelper {
   static final String nomeTabela = "evento";
@@ -17,31 +21,9 @@ class EventoHelper {
       if(_database != null){
         return _database;
       } else {
-        _database = await inicializarDataBase();
+        _database = await DataBaseHelper().database;
         return _database;
       }
-  }
-
-  _onCreate(Database database, int version) async{
-    String sql = "CREATE TABLE $nomeTabela (id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        "titulo VARCHAR, data DATETIME)";
-    await database.execute(sql);
-    sql = "CREATE TABLE anotacao (id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        "anotacao TEXT, dataProximaRevisao DATETIME, coeficienteProximaRevisao INTEGER, "
-        "coeficienteRevisaoAnterior INTEGER, "
-        "idEvento INTEGER); "
-        "ALTER TABLE anotacao ADD CONSTRAINT fk_AnotacaoEvento FOREIGN KEY idEvento "
-        "REFERENCES evento ON DELETE CASCADE;";
-    await database.execute(sql);
-  }
-
-  inicializarDataBase() async {
-    final caminhoDataBase = await getDatabasesPath();
-    final localDataBase = join(caminhoDataBase, "banco_anotacoes_gerais.db");
-
-    var database = await openDatabase(localDataBase, version: 1, onCreate: _onCreate);
-
-    return database;
   }
 
   Future<int> salvarEvento(Evento evento) async{
@@ -78,26 +60,3 @@ class EventoHelper {
   }
 
 }
-/*
-class Singleton {
-  static final Singleton _singleton = Singleton._internal();
-  	factory Singleton(){
-      print("Singleton");
-      return _singleton;
-    }
-    Singleton._internal(){
-    	print("_internal");
-  	}
-}
-void main() {
-
-  var i1 = Singleton();
-  print("***");
-  var i2 = Singleton();
-
-  print( i1 == i2 );
-
-}
-
-
-* */

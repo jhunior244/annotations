@@ -29,6 +29,8 @@ dependencies:
   intl: ^0.16.0
   sqflite: ^1.2.0
   jiffy: ^2.2.0
+  path_provider: ^0.4.1
+  bottom_navigation_badge: ^1.0.3
 dev_dependencies:
   flutter_test:
     sdk: flutter

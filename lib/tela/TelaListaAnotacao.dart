@@ -1,12 +1,10 @@
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hellor_world/Home.dart';
+import 'package:hellor_world/componente/FlushBarMensagemSucesso.dart';
+import 'package:hellor_world/componente/SliceTexto.dart';
 import 'package:hellor_world/helper/AnotacaoHelper.dart';
-import 'package:hellor_world/helper/EventoHelper.dart';
 import 'package:hellor_world/model/Anotacao.dart';
-import 'package:hellor_world/model/Evento.dart';
-import 'package:intl/intl.dart';
-import 'package:jiffy/jiffy.dart';
 
 class TelaListaAnotacao extends StatefulWidget {
   @override
@@ -16,8 +14,7 @@ class TelaListaAnotacao extends StatefulWidget {
 class _TelaListaAnotacaoState extends State<TelaListaAnotacao> {
 
   var _anotacaoHelper = AnotacaoHelper();
-  var _eventoHelper = EventoHelper();
-  List<Anotacao> _listaAnotacao = List<Anotacao>();
+  List<Anotacao> listaAnotacao = List<Anotacao>();
   bool _revisto = false;
 
   @override
@@ -31,59 +28,12 @@ class _TelaListaAnotacaoState extends State<TelaListaAnotacao> {
     List<Anotacao> anotacoesConvertidos = List<Anotacao>();
     for (var item in listaRetornada){
       Anotacao anotacao = Anotacao.fromMap(item);
-      List lista = await _eventoHelper.obtem(anotacao.idEvento);
-      if(lista.isNotEmpty){
-        Evento evento = Evento.fromMap(lista[0]);
-        anotacao.tituloEvento = evento.titulo;
         anotacoesConvertidos.add(anotacao);
-      }
     }
-
     setState(() {
-      _listaAnotacao = anotacoesConvertidos;
+      listaAnotacao = anotacoesConvertidos;
     });
     anotacoesConvertidos = null;
-  }
-
-  void show(BuildContext context, String mensagem){
-    Flushbar(
-        margin: EdgeInsets.only(bottom: 70, left: 15, right: 15),
-        message: mensagem,
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-        dismissDirection: FlushbarDismissDirection.HORIZONTAL
-    )..show(context);
-  }
-
-  String sliceAnotacao(String anotacao){
-    if(anotacao == null){
-      return "";
-    }
-    if(anotacao.contains("\n", 0)){
-      anotacao = anotacao.replaceAll(new RegExp(r'\n'), " ");
-    }
-    if(anotacao.length >= 30){
-      return anotacao.substring(0, 27) + "...";
-    }
-
-    return anotacao;
-  }
-
-  void _calculaProximaRevisao(Anotacao anotacao){
-
-    var formatter = new DateFormat('yyyy-MM-dd');
-
-    DateTime dataNow = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day).toLocal();
-
-    String dataProximaRevisao = "";
-
-    dataProximaRevisao = Jiffy(dataNow).add(days: anotacao.coeficienteProximaRevisao + anotacao.coeficienteRevisaoAnterior).toString();
-    anotacao.dataProximaRevisao = formatter.format(DateTime.parse(dataProximaRevisao));
-    int auxCoefRevAnterior = anotacao.coeficienteRevisaoAnterior;
-    anotacao.coeficienteRevisaoAnterior = anotacao.coeficienteProximaRevisao;
-    anotacao.coeficienteProximaRevisao += auxCoefRevAnterior;
-    _anotacaoHelper.atualizarAnotacao(anotacao);
-    _listaAnotacoes();
   }
 
   @override
@@ -92,9 +42,9 @@ class _TelaListaAnotacaoState extends State<TelaListaAnotacao> {
       children: <Widget>[
         Expanded(
           child: ListView.builder(
-              itemCount: _listaAnotacao.length,
+              itemCount: listaAnotacao.length,
               itemBuilder: (context, index){
-                final anotacao = _listaAnotacao[index];
+                final anotacao = listaAnotacao[index];
                 return Card(
                   color: Colors.white70,
                   child: ListTile(
@@ -132,8 +82,9 @@ class _TelaListaAnotacaoState extends State<TelaListaAnotacao> {
                                          color: Colors.blue,
                                          onPressed: (){
                                            if(_revisto){
-                                             _calculaProximaRevisao(anotacao);
+                                            Anotacao.vazio().calculaProximaRevisao(anotacao);
                                              _revisto = false;
+                                            _listaAnotacoes();
                                            }
                                             Navigator.pop(context);
                                          },
@@ -147,7 +98,7 @@ class _TelaListaAnotacaoState extends State<TelaListaAnotacao> {
                       );
                     },
                     title: Text(anotacao.tituloEvento),
-                    subtitle: Text(sliceAnotacao(anotacao.anotacao)),
+                    subtitle: Text(SliceTexto().sliceAnotacao(anotacao.anotacao, 30)),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
@@ -164,7 +115,7 @@ class _TelaListaAnotacaoState extends State<TelaListaAnotacao> {
                                           _anotacaoHelper.removerAnotacao(anotacao.id);
                                           _listaAnotacoes();
                                           Navigator.pop(context);
-                                          show(context, "Anotação excluída!");
+                                          FlushBarMensagemSucesso().show(context, "Anotação excluída!");
                                         },
                                         child: Text("Sim"),
                                       ),
