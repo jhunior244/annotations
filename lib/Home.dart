@@ -10,11 +10,12 @@ import 'package:hellor_world/tela/TelaListaAnotacao.dart';
 import 'model/Anotacao.dart';
 
 class Home extends StatefulWidget {
+  Home({ Key key }) : super(key: key);
   @override
-  _HomeState createState() => _HomeState();
+  HomeState createState() => HomeState();
 }
 
-class _HomeState extends State<Home> {
+class HomeState extends State<Home> {
 
   final notifications = FlutterLocalNotificationsPlugin();
   final anotacaoHelper = AnotacaoHelper();
@@ -39,35 +40,33 @@ class _HomeState extends State<Home> {
   }
 
   void atualizaItemNavigationBar() async {
-      List listaRetornada = await anotacaoHelper.listarAnotacao();
 
-      List<Anotacao> anotacoesConvertidos = List<Anotacao>();
-      for (var item in listaRetornada){
-        Anotacao anotacao = Anotacao.fromMap(item);
-        anotacoesConvertidos.add(anotacao);
-      }
+    int total = await anotacaoHelper.totalAnotacoesARevisar();
       setState(() {
         itemsNavigationBar =
-            NavigationBarItens().atualizaAnotacoesARevisar(anotacoesConvertidos.length);
+            NavigationBarItens().atualizaAnotacoesARevisar(total);
       });
   }
 
   Future _schedule() async {
-    var horaNotificacao = Time(23, 28, 0);
-    var androidPlatformChannelSpecifics =
-    AndroidNotificationDetails('your other channel id',
-        'your other channel name', 'your other channel description');
-    var iOSPlatformChannelSpecifics =
-    IOSNotificationDetails();
-    NotificationDetails platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    int total = await anotacaoHelper.totalAnotacoesARevisar();
+    if(total > 0){
+      var horaNotificacao = Time(23, 40, 0);
+      var androidPlatformChannelSpecifics =
+      AndroidNotificationDetails('your other channel id',
+          'your other channel name', 'your other channel description');
+      var iOSPlatformChannelSpecifics =
+      IOSNotificationDetails();
+      NotificationDetails platformChannelSpecifics = NotificationDetails(
+          androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
 
-    await notifications.showDailyAtTime(
-        0,
-        'Anotações pendentes de revisão',
-        'Acesse o annotations para revisar.',
-        horaNotificacao,
-        platformChannelSpecifics);
+      await notifications.showDailyAtTime(
+          0,
+          'Anotações',
+          'Você tem ' + total.toString() +  ' anotações para revisar.',
+          horaNotificacao,
+          platformChannelSpecifics);
+    }
   }
 
   Future onSelectNotification(String payload) {

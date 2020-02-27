@@ -65,7 +65,19 @@ class AnotacaoHelper {
         "OR julianday(evento.data) = julianday('now', '+1 days')";
 
     List listaAnotacao = await dataBase.rawQuery(sql);
-    return listaAnotacao;
+
+    List<Anotacao> anotacoesConvertidos = List<Anotacao>();
+    for (var item in listaAnotacao){
+      Anotacao anotacao = Anotacao.fromMap(item);
+      anotacoesConvertidos.add(anotacao);
+    }
+    return anotacoesConvertidos;
+  }
+
+  Future <int> totalAnotacoesARevisar() async{
+    List<Anotacao> listaRetornada = await listarAnotacao();
+
+    return listaRetornada.length;
   }
 
   Future<int> removerAnotacao( int id ) async {

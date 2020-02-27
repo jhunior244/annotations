@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hellor_world/componente/FlushBarMensagemSucesso.dart';
 import 'package:hellor_world/helper/AnotacaoHelper.dart';
+import 'package:hellor_world/main.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:jiffy/jiffy.dart';
@@ -89,5 +90,6 @@ class Anotacao {
     int resultado = await _anotacaoHelper.salvarAnotacao(anotacao);
     Navigator.pop(context);
     FlushBarMensagemSucesso().show(context, "Anotação criada!");
+    key.currentState.atualizaItemNavigationBar();
   }
 }

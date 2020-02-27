@@ -4,9 +4,12 @@ import 'package:hellor_world/Home.dart';
 import 'package:hellor_world/componente/FlushBarMensagemSucesso.dart';
 import 'package:hellor_world/componente/SliceTexto.dart';
 import 'package:hellor_world/helper/AnotacaoHelper.dart';
+import 'package:hellor_world/main.dart';
 import 'package:hellor_world/model/Anotacao.dart';
 
 class TelaListaAnotacao extends StatefulWidget {
+  final Home home = Home();
+
   @override
   _TelaListaAnotacaoState createState() => _TelaListaAnotacaoState();
 }
@@ -23,17 +26,13 @@ class _TelaListaAnotacaoState extends State<TelaListaAnotacao> {
   }
 
   _listaAnotacoes() async{
-    List listaRetornada = await _anotacaoHelper.listarAnotacao();
+    List<Anotacao> listaRetornada = await _anotacaoHelper.listarAnotacao();
 
-    List<Anotacao> anotacoesConvertidos = List<Anotacao>();
-    for (var item in listaRetornada){
-      Anotacao anotacao = Anotacao.fromMap(item);
-        anotacoesConvertidos.add(anotacao);
-    }
     setState(() {
-      listaAnotacao = anotacoesConvertidos;
+      listaAnotacao = listaRetornada;
     });
-    anotacoesConvertidos = null;
+    listaRetornada = null;
+    key.currentState.atualizaItemNavigationBar();
   }
 
   @override
